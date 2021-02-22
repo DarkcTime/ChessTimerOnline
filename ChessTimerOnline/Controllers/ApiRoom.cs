@@ -27,35 +27,104 @@ namespace ChessTimerOnline.Controllers
             return ListRooms; 
         }
 
-        // GET: api/<ApiRoom>/GetRoom/5
+        // GET: api/<ApiRoom>/1
         [HttpGet("{id}")]
-        public Room GetRoom(int id)
+        public ActionResult<Room> GetRoom(int id)
         {
-            return GetRoomFromList(id);
+            try
+            {
+                Room room = GetRoomFromList(id); 
+                if(room == null)
+                {
+                    return NotFound("Room not found");
+                }
+                return room;
+            }
+            catch(Exception ex)
+            {
+                return NotFound(ex.Message.ToString());
+            }
+           
         }
 
         // POST api/<ApiRoom>/
         [HttpPost]
-        public void AddRoom(Room room)
+        public ActionResult<string> AddRoom(Room room)
         {
-            ListRooms.Add(room);
+            try
+            {
+                if (room == null)
+                {
+                    return BadRequest("Room is null");
+                }
+
+                ListRooms.Add(room);
+
+                return "Success"; 
+            }
+            catch(Exception ex)
+            {
+
+                return NotFound(ex.Message.ToString());
+            }
+            
         }
 
         // PUT api/<ApiRoom>/1
-        [HttpPut("{id}")]
-        public void ChangeTimeUpdate(int id, Room room)
+        [HttpPut("{id:int}")]
+        public ActionResult<string> UpdateRoomTime(int id, Room room)
         {
-            Room roomFind = GetRoomFromList(id);
-            int index = ListRooms.IndexOf(roomFind);
-            ListRooms[index].TimePlayer1 = room.TimePlayer1;
+            try
+            {
+                if(room == null)
+                {
+                    return BadRequest("Room is null");
+                }
+
+                if(id != room.Id)
+                {
+                    return BadRequest("Room ID mismatch");
+                }
+
+                Room roomToUpdate = GetRoomFromList(id); 
+
+                if(roomToUpdate == null)
+                {
+                    return NotFound("Room not found");
+                }
+
+                int indexRoom = ListRooms.IndexOf(roomToUpdate);
+                ListRooms[indexRoom].TimePlayer1 = room.TimePlayer1;
+                ListRooms[indexRoom].TimePlayer2 = room.TimePlayer2;
+
+                return "Success";
+            }
+            catch(Exception ex)
+            {
+                return NotFound(ex.Message.ToString());  
+            }
         }
 
-        // DELETE api/<ApiRoom>/5
-        [HttpDelete("{id}")]
-        public void Delete(int id)
+        // DELETE api/<ApiRoom>/1
+        [HttpDelete("{id:int}")]
+        public ActionResult<string> Delete(int id)
         {
-            Room room = GetRoomFromList(id);
-            ListRooms.Remove(room);
+            try
+            {
+                Room room = GetRoomFromList(id);
+                if(room == null)
+                {
+                    return NotFound("Room not found");
+                }
+                ListRooms.Remove(room); 
+
+                return "Success"; 
+            }
+            catch (Exception ex)
+            {
+                return NotFound(ex.Message.ToString());
+            }
+                    
         }
     }
 }
