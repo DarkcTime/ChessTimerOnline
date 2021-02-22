@@ -28,7 +28,7 @@ namespace ChessTimerOnline.Controllers
         }
 
         // GET: api/<ApiRoom>/1
-        [HttpGet("{id}")]
+        [HttpGet("{id:int}")]
         public ActionResult<Room> GetRoom(int id)
         {
             try
@@ -72,7 +72,7 @@ namespace ChessTimerOnline.Controllers
 
         // PUT api/<ApiRoom>/1
         [HttpPut("{id:int}")]
-        public ActionResult<string> UpdateRoomTime(int id, Room room)
+        public ActionResult<Room> UpdateRoomTime(int id, Room room)
         {
             try
             {
@@ -97,7 +97,7 @@ namespace ChessTimerOnline.Controllers
                 ListRooms[indexRoom].TimePlayer1 = room.TimePlayer1;
                 ListRooms[indexRoom].TimePlayer2 = room.TimePlayer2;
 
-                return "Success";
+                return ListRooms[indexRoom];
             }
             catch(Exception ex)
             {
