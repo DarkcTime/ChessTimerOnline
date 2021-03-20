@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChessTimerOnline.Repositories;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -13,43 +14,47 @@ namespace ChessTimerOnline.Controllers
     [ApiController]
     public class ApiRoom : ControllerBase
     {
-        public static List<Room> ListRooms = new List<Room>();
+        
+        private readonly IRoomRepository _repository;
 
-        private Room GetRoomFromList(int id)
+        public ApiRoom(IRoomRepository roomRepository)
         {
-            return ListRooms.Where(i => i.Id == id).FirstOrDefault();
+            _repository = roomRepository;
         }
+        
 
         // GET: api/<ApiRoom>/
         [HttpGet]
-        public List<Room> GetRooms()
+        public async Task<IEnumerable<Room>> GetRooms()
         {
-            return ListRooms; 
+            return await _repository.GetRoomsAsync();
         }
 
         // GET: api/<ApiRoom>/1
         [HttpGet("{id:int}")]
-        public ActionResult<Room> GetRoom(int id)
+        public async Task<ActionResult<Room>> GetRoom(int id)
         {
             try
             {
-                Room room = GetRoomFromList(id); 
+                Room room = await _repository.GetRoomByIdOrNullAsync(id); 
+                
                 if(room == null)
                 {
                     return NotFound("Room not found");
                 }
+                
                 return room;
             }
             catch(Exception ex)
             {
-                return NotFound(ex.Message.ToString());
+                return NotFound(ex.Message);
             }
            
         }
 
         // POST api/<ApiRoom>/
         [HttpPost]
-        public ActionResult<string> AddRoom(Room room)
+        public async Task<ActionResult<AddRoomResult>> AddRoom(Room room)
         {
             try
             {
@@ -58,19 +63,23 @@ namespace ChessTimerOnline.Controllers
                     return BadRequest("Room is null");
                 }
 
-                ListRooms.Add(room);
+                await _repository.AddRoomAsync(room);
 
-                return "Success"; 
+                return new AddRoomResult()
+                {
+                    Id = room.Id
+                };
+                
             }
             catch(Exception ex)
             {
 
-                return NotFound(ex.Message.ToString());
+                return NotFound(ex.Message);
             }
             
         }
 
-        // PUT api/<ApiRoom>/1
+      /*  // PUT api/<ApiRoom>/1
         [HttpPut("{id:int}")]
         public ActionResult<Room> UpdateRoomTime(int id, Room room)
         {
@@ -103,22 +112,25 @@ namespace ChessTimerOnline.Controllers
             {
                 return NotFound(ex.Message.ToString());  
             }
-        }
+        }*/
 
         // DELETE api/<ApiRoom>/1
         [HttpDelete("{id:int}")]
-        public ActionResult<string> Delete(int id)
+        public async Task<ActionResult> Delete(int id)
         {
             try
             {
-                Room room = GetRoomFromList(id);
-                if(room == null)
+                bool isSuccess = await _repository
+                    .DeleteRoomAsync(id);
+
+                if (isSuccess)
+                {
+                    return StatusCode(200);
+                }
+                else
                 {
                     return NotFound("Room not found");
                 }
-                ListRooms.Remove(room); 
-
-                return "Success"; 
             }
             catch (Exception ex)
             {

@@ -10,6 +10,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ChessTimerOnline.Hubs;
+using ChessTimerOnline.Repositories;
 
 namespace ChessTimerOnline
 {
@@ -26,6 +28,8 @@ namespace ChessTimerOnline
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddRepositories();
+            services.AddSignalR();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,8 +40,6 @@ namespace ChessTimerOnline
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseAuthorization();
@@ -45,6 +47,7 @@ namespace ChessTimerOnline
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapHub<TimerHub>("/api/timerHub");
             });
         }
     }

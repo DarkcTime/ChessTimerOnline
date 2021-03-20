@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace ChessTimerOnline
@@ -21,6 +22,10 @@ namespace ChessTimerOnline
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                    webBuilder.UseKestrel(options =>
+                    {
+                        options.Listen(IPAddress.Parse("127.0.0.1"), 8080);
+                    });
                 });
     }
 }
