@@ -53,7 +53,10 @@ namespace ChessTimerOnline.Hubs
 
                     lock (_roomConnectionIds)
                     {
-                        connections = _roomConnectionIds[game.Room.Id];
+                        if (_roomConnectionIds.ContainsKey(game.Room.Id))
+                        {
+                            connections = _roomConnectionIds[game.Room.Id];
+                        }
                     }
 
                     if (connections != null)
